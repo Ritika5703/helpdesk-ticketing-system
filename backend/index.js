@@ -12,7 +12,24 @@ const app = express();
 const port = process.env.PORT || 4000;
 connectDb();
 
-const allowedOrigins = [process.env.FRONTEND_URL];
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // e.g. https://helpdesk-ticketing-system.vercel.app
+  "http://localhost:5173", // for development
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS Not Allowed"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // This ensures URL-encoded body parsing
 app.use(cookieParser());
