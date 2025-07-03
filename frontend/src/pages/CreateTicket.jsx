@@ -33,10 +33,17 @@ const NewTicket = () => {
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem("token");
+
       const { data } = await axios.post(
         `${backendUrl}/api/tickets/create`,
         formData,
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
       );
 
       if (data.success) {
