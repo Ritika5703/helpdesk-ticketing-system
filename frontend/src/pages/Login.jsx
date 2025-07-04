@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { backendUrl, setIsLoggedin, setUserData } = useContext(AppContext);
+  const { backendUrl, setIsLoggedin, setUserData, getUserData } =
+    useContext(AppContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,7 +24,7 @@ const Login = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         setIsLoggedin(true);
-        await getUser(); // get user data after login
+        await getUserData(); // get user data after login
         toast.success("Login successful!");
         navigate("/dashboard"); // or wherever you want to redirect
       } else {
@@ -36,25 +37,17 @@ const Login = () => {
 
   const getUser = async () => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/auth/is-auth`,
-        {},
-        { withCredentials: true }
-      );
-      if (data.success) {
-        const res = await axios.get(`${backendUrl}/api/user/data`, {
-          withCredentials: true,
-        });
-        if (res.data.success) {
-          setUserData(res.data.userData);
-        } else {
-          toast.error("Failed to fetch user data");
-        }
+      const res = await axios.get(`${backendUrl}/api/user/data`, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        setUserData(res.data.userData);
       } else {
-        toast.error("Authentication failed");
+        toast.error("Failed to fetch user data");
       }
     } catch (error) {
-      toast.error("Error fetching user");
+      toast.error(error?.response?.data?.message || "Error fetching user");
     }
   };
 
