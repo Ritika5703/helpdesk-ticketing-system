@@ -46,7 +46,7 @@ export const AppContextProvider = (props) => {
   const getUserData = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/user/data`, {
-        withCredentials: true, // ✅ sends cookie
+        withCredentials: true, //  sends cookie
       });
 
       if (data.success) {
