@@ -1,4 +1,5 @@
 import Ticket from "../models/ticketModel.js";
+import userModel from "../models/userModel.js";
 
 // Create a new ticket
 export const createTicket = async (req, res) => {
@@ -16,10 +17,37 @@ export const createTicket = async (req, res) => {
     } = req.body;
 
     const createdBy = req.userId;
+    const attachment = req.file;
 
-    const newTicket = new Ticket({
+    // Basic validation
+    if (
+      !ticketNo ||
+      !date ||
+      !name ||
+      !department ||
+      !subject ||
+      !category ||
+      !type ||
+      !priority ||
+      !description
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all required fields.",
+      });
+    }
+
+    const user = await userModel.findById(createdBy);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid user. Please login again.",
+      });
+    }
+
+    const ticketData = new Ticket({
       ticketNo,
-      date,
+      date: new Date(date),
       name,
       department,
       subject,
@@ -29,9 +57,20 @@ export const createTicket = async (req, res) => {
       description,
       createdBy,
     });
+    if (attachment) {
+      ticketData.attachment = {
+        data: attachment.buffer,
+        contentType: attachment.mimetype,
+      };
+      const newTicket = new Ticket(ticketData);
 
-    await newTicket.save();
-    res.status(201).json({ success: true, ticket: newTicket });
+      await newTicket.save();
+      res.status(201).json({
+        success: true,
+        message: "Ticket created successfully",
+        ticket: newTicket,
+      });
+    }
   } catch (error) {
     console.error("Create Ticket Error:", error);
     res.status(500).json({ success: false, message: "Ticket creation failed" });
