@@ -11,10 +11,15 @@ const ticketSchema = new mongoose.Schema(
     type: { type: String, required: true },
     priority: { type: String, required: true },
     description: { type: String, required: true },
-    status: { type: String, default: "pending" },
+    status: { type: String, default: "In Progress" },
     rating: { type: Number, default: 0 },
     supportBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Optional
+    attachment: {
+      data: Buffer,
+      contentType: String,
+    },
+
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
