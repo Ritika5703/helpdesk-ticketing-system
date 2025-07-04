@@ -126,7 +126,6 @@ export const getUserData = async (req, res) => {
   try {
     const user = await userModel.findById(req.userId);
     if (!user) return res.json({ success: false, message: "User not found" });
-    console.log("Decoded userId:", req.userId);
 
     return res.json({ success: true, user });
   } catch (error) {
